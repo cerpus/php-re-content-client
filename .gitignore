@@ -1,0 +1,11 @@
+vendor/
+.idea/
+composer.lock
+
+/.phpstorm.meta.php
+/_ide_helper.php
+/_ide_helper_models.php
+
+.env
+.env.backup
+.phpunit.result.cache
