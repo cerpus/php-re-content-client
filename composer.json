@@ -13,7 +13,8 @@
   "require": {
     "php": "^7.2",
     "guzzlehttp/guzzle": "^6.0",
-    "illuminate/support": "^6.0|^7.0"
+    "illuminate/support": "^6.0|^7.0",
+    "cerpus/cerpushelper": "^1.4"
   },
   "autoload": {
     "psr-4": {
@@ -31,5 +32,15 @@
         "Cerpus\\REContentClient\\REContentClientProvider"
       ]
     }
-  }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https:\/\/composer.cerpus.net\/"
+    },
+    {
+      "type": "composer",
+      "url": "https:\/\/composer-3rdparty.cerpus.net\/"
+    }
+  ]
 }

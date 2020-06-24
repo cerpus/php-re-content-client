@@ -31,7 +31,7 @@ class ContentClient
 
     /**
      * Create content
-     * @param  REContent  $content
+     * @param REContent $content
      * @return bool
      */
     public function create(REContent $content): bool
@@ -51,7 +51,7 @@ class ContentClient
 
     /**
      * Update content
-     * @param  REContent  $content
+     * @param REContent $content
      * @return bool
      */
     public function update(REContent $content): bool
@@ -71,7 +71,7 @@ class ContentClient
     /**
      * Remove content by ID.
      *
-     * @param  string  $contentId
+     * @param string $contentId
      * @return bool
      */
     public function remove(string $contentId): bool
@@ -111,7 +111,7 @@ class ContentClient
     }
 
     /**
-     * @param  array  $ids  Ids to check for existence of.
+     * @param array $ids Ids to check for existence of.
      * @return array Ids that exist in the content index
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
@@ -136,18 +136,21 @@ class ContentClient
 
             return [];
         } catch (RequestException $e) {
-            Log::error(__METHOD__.": ({$e->getCode()}) {$e->getMessage()}");
+            if($this->logger){
+                $this->logger->error(__METHOD__ . ": ({$e->getCode()}) {$e->getMessage()}");
+            }
+            
             return [];
         }
     }
 
 
     /**
-     * @param  string  $method
-     * @param  string  $endpoint
-     * @param  array|null  $payload
-     * @param  bool  $defaultResult
-     * @param  int  $expectedResponseCode
+     * @param string $method
+     * @param string $endpoint
+     * @param array|null $payload
+     * @param bool $defaultResult
+     * @param int $expectedResponseCode
      * @return bool|mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
