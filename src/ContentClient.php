@@ -45,6 +45,9 @@ class ContentClient
 
             return $this->getLastRequestException() === null;
         } catch (RequestException $e) {
+            if($this->logger){
+                $this->logger->error(__METHOD__."({$e->getCode()}) {$e->getMessage()}");
+            }
             return false;
         }
     }
@@ -64,6 +67,9 @@ class ContentClient
 
             return $this->getLastRequestException() === null;
         } catch (RequestException $e) {
+            if($this->logger){
+                $this->logger->error(__METHOD__."({$e->getCode()}) {$e->getMessage()}");
+            }
             return false;
         }
     }
@@ -83,6 +89,9 @@ class ContentClient
 
             return $this->getLastRequestException() === null;
         } catch (RequestException $e) {
+            if($this->logger){
+                $this->logger->error(__METHOD__."({$e->getCode()}) {$e->getMessage()}");
+            }
             return false;
         }
     }
@@ -139,7 +148,7 @@ class ContentClient
             if($this->logger){
                 $this->logger->error(__METHOD__ . ": ({$e->getCode()}) {$e->getMessage()}");
             }
-            
+
             return [];
         }
     }
@@ -167,6 +176,10 @@ class ContentClient
         $result = $defaultResult;
 
         try {
+            if($this->logger){
+                $this->logger->debug("Headers", $this->getClient()->getConfig("headers"));
+            }
+
             $response = $this->getClient()->request($method, $endpoint, $options);
 
             if ($response->getStatusCode() !== $expectedResponseCode) {
