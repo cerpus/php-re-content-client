@@ -2,7 +2,7 @@
 
 namespace Cerpus\REContentClient;
 
-use Cerpus\Helper\Clients\CachingAuthClient;
+use Cerpus\LaravelAuth\Service\CerpusAuthService;
 use GuzzleHttp\Client;
 use Illuminate\Log\Logger;
 use Illuminate\Support\ServiceProvider;
@@ -32,8 +32,13 @@ class REContentClientProvider extends ServiceProvider
         ]);
 
         $this->app->singleton(ContentClient::class, function () {
-            /** @var CachingAuthClient $ccToken */
-            $ccToken = app(CachingAuthClient::class)->fetchCCToken();
+//            /** @var CachingAuthClient $ccToken */
+//            $ccToken = app(CachingAuthClient::class)->fetchCCToken();
+
+            $ccToken = app(CerpusAuthService::class)
+                ->getClientCredentialsTokenRequest()
+                ->execute()
+                ->access_token;
 
             $httpClient = new Client([
                 "base_uri" => config("re-content-index.content-index-url"),
