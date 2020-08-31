@@ -11,11 +11,13 @@ class REContent
 {
     private $id = null;
     private $title = null;
+    private $content = null;
     private $desctiption = null;
     private $tags = null;
     private $type = null;
     private $license = null;
     private $previous_version = null;
+
 
     /**
      * @return mixed
@@ -64,6 +66,26 @@ class REContent
 
         if (empty($this->title)) {
             $this->title = null;
+        }
+    }
+
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+
+    public function setContent($content = null): void
+    {
+        if (empty($content)) {
+            $this->content = null;
+            return;
+        }
+
+        $this->content = $this->cleanString($content);
+
+        if (empty($this->content)) {
+            $this->content = null;
         }
     }
 
@@ -202,6 +224,7 @@ class REContent
         $payload = [
             "id" => $this->getId(),
             "title" => $this->getTitle(),
+            "content" => $this->getContent(),
             "description" => $this->getDesctiption(),
             "tags" => $this->getTags(),
             "type" => $this->getType(),
@@ -234,7 +257,7 @@ class REContent
      */
     protected function cleanUpPayload(array $payload): array
     {
-        $optionalFields = ["description", "tags", "previous_version"];
+        $optionalFields = ["description", "content", "tags", "previous_version"];
 
         foreach ($optionalFields as $field) {
             if (empty($payload[$field])) {
