@@ -4,6 +4,7 @@
 namespace Cerpus\REContentClient;
 
 
+use Carbon\Carbon;
 use Cerpus\REContentClient\Exceptions\MissingDataException;
 use Illuminate\Support\Str;
 
@@ -13,11 +14,30 @@ class REContent
     private $title = null;
     private $content = null;
     private $desctiption = null;
+    private $last_updated_at = null;
     private $tags = null;
     private $type = null;
     private $license = null;
     private $previous_version = null;
 
+    public function generatePayload(): array
+    {
+        $payload = [
+            "id" => $this->getId(),
+            "title" => $this->getTitle(),
+            "content" => $this->getContent(),
+            "description" => $this->getDesctiption(),
+            "last_updated_at" => $this->getLastUpdatedAt(),
+            "tags" => $this->getTags(),
+            "type" => $this->getType(),
+            "previous_version" => $this->getPreviousVersion(),
+            "license" => $this->getLicense(),
+        ];
+
+        $this->verifyPayload($payload);
+
+        return $this->cleanUpPayload($payload);
+    }
 
     /**
      * @return mixed
@@ -42,6 +62,15 @@ class REContent
         if (empty($this->id)) {
             $this->id = null;
         }
+    }
+
+    protected function cleanString($string)
+    {
+        if (!$string) {
+            return $string;
+        }
+
+        return trim(strip_tags(html_entity_decode($string)));
     }
 
     /**
@@ -74,7 +103,6 @@ class REContent
         return $this->content;
     }
 
-
     public function setContent($content = null): void
     {
         if (empty($content)) {
@@ -86,31 +114,6 @@ class REContent
 
         if (empty($this->content)) {
             $this->content = null;
-        }
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param  string  $type
-     */
-    public function setType($type): void
-    {
-        if (empty($type)) {
-            $this->type = null;
-            return;
-        }
-
-        $this->type = $this->cleanString($type);
-
-        if (empty($this->type)) {
-            $this->type = null;
         }
     }
 
@@ -137,6 +140,20 @@ class REContent
         if (empty($this->desctiption)) {
             $this->desctiption = null;
         }
+    }
+
+    public function getLastUpdatedAt()
+    {
+        return $this->last_updated_at;
+    }
+
+    public function setLastUpdatedAt($updatedAt = null)
+    {
+        if ($updatedAt instanceof Carbon) {
+            $updatedAt = $updatedAt->timestamp;
+        }
+
+        $this->last_updated_at = $updatedAt;
     }
 
     /**
@@ -169,27 +186,27 @@ class REContent
     }
 
     /**
-     * @return string|null
+     * @return mixed
      */
-    public function getLicense()
+    public function getType()
     {
-        return $this->license;
+        return $this->type;
     }
 
     /**
-     * @param  string  $license
+     * @param  string  $type
      */
-    public function setLicense($license): void
+    public function setType($type): void
     {
-        if (empty($license)) {
-            $this->license = null;
+        if (empty($type)) {
+            $this->type = null;
             return;
         }
 
-        $this->license = $license;
+        $this->type = $this->cleanString($type);
 
-        if (empty($this->license)) {
-            $this->license = null;
+        if (empty($this->type)) {
+            $this->type = null;
         }
     }
 
@@ -218,23 +235,29 @@ class REContent
         }
     }
 
-
-    public function generatePayload(): array
+    /**
+     * @return string|null
+     */
+    public function getLicense()
     {
-        $payload = [
-            "id" => $this->getId(),
-            "title" => $this->getTitle(),
-            "content" => $this->getContent(),
-            "description" => $this->getDesctiption(),
-            "tags" => $this->getTags(),
-            "type" => $this->getType(),
-            "previous_version" => $this->getPreviousVersion(),
-            "license" => $this->getLicense(),
-        ];
+        return $this->license;
+    }
 
-        $this->verifyPayload($payload);
+    /**
+     * @param  string  $license
+     */
+    public function setLicense($license): void
+    {
+        if (empty($license)) {
+            $this->license = null;
+            return;
+        }
 
-        return $this->cleanUpPayload($payload);
+        $this->license = $license;
+
+        if (empty($this->license)) {
+            $this->license = null;
+        }
     }
 
     /**
@@ -257,7 +280,7 @@ class REContent
      */
     protected function cleanUpPayload(array $payload): array
     {
-        $optionalFields = ["description", "content", "tags", "previous_version"];
+        $optionalFields = ["description", "content", "tags", "previous_version", "last_updated_at"];
 
         foreach ($optionalFields as $field) {
             if (empty($payload[$field])) {
@@ -266,15 +289,6 @@ class REContent
         }
 
         return $payload;
-    }
-
-    protected function cleanString($string)
-    {
-        if (!$string) {
-            return $string;
-        }
-
-        return trim(strip_tags(html_entity_decode($string)));
     }
 
 }

@@ -24,103 +24,8 @@ class ContentClient
         $this->logger = $logger;
     }
 
-    public function getClient(): Client
-    {
-        return $this->client;
-    }
-
     /**
-     * Create content
-     * @param REContent $content
-     * @return bool
-     */
-    public function create(REContent $content): bool
-    {
-        $path = "/content-index";
-
-        $payload = $content->generatePayload();
-
-        try {
-            $this->doRequest("POST", $path, $payload);
-
-            return $this->getLastRequestException() === null;
-        } catch (RequestException $e) {
-            if($this->logger){
-                $this->logger->error(__METHOD__."({$e->getCode()}) {$e->getMessage()}");
-            }
-            return false;
-        }
-    }
-
-    /**
-     * Update content
-     * @param REContent $content
-     * @return bool
-     */
-    public function update(REContent $content): bool
-    {
-        $path = sprintf("content-index/%s", $content->getId());
-
-        $payload = $content->generatePayload();
-        try {
-            $response = $this->doRequest("PATCH", $path, $payload);
-
-            return $this->getLastRequestException() === null;
-        } catch (RequestException $e) {
-            if($this->logger){
-                $this->logger->error(__METHOD__."({$e->getCode()}) {$e->getMessage()}");
-            }
-            return false;
-        }
-    }
-
-    /**
-     * Remove content by ID.
-     *
-     * @param string $contentId
-     * @return bool
-     */
-    public function remove(string $contentId): bool
-    {
-        $path = sprintf("content-index/%s", $contentId);
-
-        try {
-            $response = $this->doRequest("DELETE", $path);
-
-            return $this->getLastRequestException() === null;
-        } catch (RequestException $e) {
-            if($this->logger){
-                $this->logger->error(__METHOD__."({$e->getCode()}) {$e->getMessage()}");
-            }
-            return false;
-        }
-    }
-
-
-    /**
-     * @param $contentId
-     * @return bool
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function exists($contentId): bool
-    {
-        $path = sprintf("content-index/%s/exists", $contentId);
-
-        try {
-            $response = $this->doRequest("GET", $path, null, false, Response::HTTP_OK);
-
-            return $this->getLastRequestException() === null;
-        } catch (ClientException $e) {
-            if ($e->getCode() === Response::HTTP_NOT_FOUND) {
-                return false;
-            }
-
-            throw $e;
-        }
-    }
-
-    /**
-     * @param array $ids Ids to check for existence of.
+     * @param  array  $ids  Ids to check for existence of.
      * @return array Ids that exist in the content index
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
@@ -145,21 +50,20 @@ class ContentClient
 
             return [];
         } catch (RequestException $e) {
-            if($this->logger){
-                $this->logger->error(__METHOD__ . ": ({$e->getCode()}) {$e->getMessage()}");
+            if ($this->logger) {
+                $this->logger->error(__METHOD__.": ({$e->getCode()}) {$e->getMessage()}");
             }
 
             return [];
         }
     }
 
-
     /**
-     * @param string $method
-     * @param string $endpoint
-     * @param array|null $payload
-     * @param bool $defaultResult
-     * @param int $expectedResponseCode
+     * @param  string  $method
+     * @param  string  $endpoint
+     * @param  array|null  $payload
+     * @param  bool  $defaultResult
+     * @param  int  $expectedResponseCode
      * @return bool|mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
@@ -176,7 +80,7 @@ class ContentClient
         $result = $defaultResult;
 
         try {
-            if($this->logger){
+            if ($this->logger) {
                 $this->logger->debug("Headers", $this->getClient()->getConfig("headers"));
             }
 
@@ -213,24 +117,9 @@ class ContentClient
         return $result;
     }
 
-    // ****************************
-    // Utility functions
-    // ****************************
-    public function removeIfExists(REContent $content): bool
+    public function getClient(): Client
     {
-        if ($this->exists($content->getId())) {
-            return $this->remove($content->getId());
-        }
-        return true;
-    }
-
-    public function updateOrCreate(REContent $content): bool
-    {
-        if ($this->exists($content->getId())) {
-            return $this->update($content);
-        }
-
-        return $this->create($content);
+        return $this->client;
     }
 
     /**
@@ -246,5 +135,115 @@ class ContentClient
     public function setLastRequestException(?\Throwable $t): void
     {
         $this->lastRequestException = $t;
+    }
+
+    public function removeIfExists(REContent $content): bool
+    {
+        if ($this->exists($content->getId())) {
+            return $this->remove($content->getId());
+        }
+        return true;
+    }
+
+    /**
+     * @param $contentId
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function exists($contentId): bool
+    {
+        $path = sprintf("content-index/%s/exists", $contentId);
+
+        try {
+            $response = $this->doRequest("GET", $path, null, false, Response::HTTP_OK);
+
+            return $this->getLastRequestException() === null;
+        } catch (ClientException $e) {
+            if ($e->getCode() === Response::HTTP_NOT_FOUND) {
+                return false;
+            }
+
+            throw $e;
+        }
+    }
+
+    // ****************************
+    // Utility functions
+    // ****************************
+
+    /**
+     * Remove content by ID.
+     *
+     * @param  string  $contentId
+     * @return bool
+     */
+    public function remove(string $contentId): bool
+    {
+        $path = sprintf("content-index/%s", $contentId);
+
+        try {
+            $response = $this->doRequest("DELETE", $path);
+
+            return $this->getLastRequestException() === null;
+        } catch (RequestException $e) {
+            if ($this->logger) {
+                $this->logger->error(__METHOD__."({$e->getCode()}) {$e->getMessage()}");
+            }
+            return false;
+        }
+    }
+
+    public function updateOrCreate(REContent $content): bool
+    {
+        if ($this->exists($content->getId())) {
+            return $this->update($content);
+        }
+
+        return $this->create($content);
+    }
+
+    /**
+     * Update content
+     * @param  REContent  $content
+     * @return bool
+     */
+    public function update(REContent $content): bool
+    {
+        $path = sprintf("content-index/%s", $content->getId());
+
+        $payload = $content->generatePayload();
+        try {
+            $response = $this->doRequest("PATCH", $path, $payload);
+
+            return $this->getLastRequestException() === null;
+        } catch (RequestException $e) {
+            if ($this->logger) {
+                $this->logger->error(__METHOD__."({$e->getCode()}) {$e->getMessage()}");
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Create content
+     * @param  REContent  $content
+     * @return bool
+     */
+    public function create(REContent $content): bool
+    {
+        $path = "/content-index";
+
+        $payload = $content->generatePayload();
+
+        try {
+            $this->doRequest("POST", $path, $payload);
+
+            return $this->getLastRequestException() === null;
+        } catch (RequestException $e) {
+            if ($this->logger) {
+                $this->logger->error(__METHOD__."({$e->getCode()}) {$e->getMessage()}");
+            }
+            return false;
+        }
     }
 }
