@@ -32,18 +32,9 @@ class REContentClientProvider extends ServiceProvider
         ]);
 
         $this->app->singleton(ContentClient::class, function () {
-//            /** @var CachingAuthClient $ccToken */
-//            $ccToken = app(CachingAuthClient::class)->fetchCCToken();
-
-            $ccToken = app(CerpusAuthService::class)
-                ->getClientCredentialsTokenRequest()
-                ->execute()
-                ->access_token;
-
             $httpClient = new Client([
                 "base_uri" => config("re-content-index.content-index-url"),
                 "headers" => [
-                    "Authorization" => "Bearer $ccToken",
                     "Content-Type" => "application/json",
                     "Accept" => "application/json",
                 ],
