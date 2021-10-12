@@ -2,7 +2,7 @@
   "name": "cerpus/re-content-client",
   "description": "A Laravel client to make working with the Recommendation Engine Content Index a breeze",
   "type": "library",
-  "license": "proprietary",
+  "license": "GPL-3.0-only",
   "authors": [
     {
       "name": "Odd-Arne Johansen",
@@ -32,15 +32,5 @@
         "Cerpus\\REContentClient\\REContentClientProvider"
       ]
     }
-  },
-  "repositories": [
-    {
-      "type": "composer",
-      "url": "https:\/\/composer.cerpus.net\/"
-    },
-    {
-      "type": "composer",
-      "url": "https:\/\/composer-3rdparty.cerpus.net\/"
-    }
-  ]
+  }
 }
